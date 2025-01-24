@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Stack;
+
 
 /**
  * A collection of products,
@@ -17,7 +22,41 @@ public class Basket extends ArrayList<Product> implements Serializable
 {
   private static final long serialVersionUID = 1;
   private int    theOrderNum = 0;          // Order number
+  private Stack<Product> addHistory = new Stack<>(); // History of added products for undo functionality
   
+  /**
+   * Sorts the items in the basket in ascending order
+   * based on their product numbers.
+   */
+  public void sortBasketByProductNumber()
+  {
+    Collections.sort(this, Comparator.comparing(Product::getProductNum));
+  }
+  
+  public void mergeDuplicateProducts()
+  {
+    HashMap<String, Product> mergedProducts = new HashMap<>();
+
+    for (Product product : this)
+    {
+      String productNum = product.getProductNum();
+      if (mergedProducts.containsKey(productNum))
+      {
+        // If the product already exists, add its quantity to the existing product
+        Product existingProduct = mergedProducts.get(productNum);
+        existingProduct.setQuantity(existingProduct.getQuantity() + product.getQuantity());
+      }
+      else
+      {
+        // Otherwise, add the product to the map
+        mergedProducts.put(productNum, product);
+      }
+    }
+
+    // Clear the basket and re-add merged products
+    this.clear();
+    this.addAll(mergedProducts.values());
+  }
   /**
    * Constructor for a basket which is
    *  used to represent a customer order/ wish list
@@ -57,8 +96,25 @@ public class Basket extends ArrayList<Product> implements Serializable
   @Override
   public boolean add( Product pr )
   {                              
-    return super.add( pr );     // Call add in ArrayList
+      addHistory.push(pr); //Record the product in the add history
+      return super.add( pr );     // Call add in ArrayList
+    
+
   }
+  
+  /**
+   * Undo the last added product to the Basket.
+   * Removes the most recently added product if there is any.
+   * @return true if undo was successful, false if there is nothing to undo.
+   */
+  public boolean undoAdd() {
+    if (!addHistory.isEmpty()) {
+      Product lastAdded = addHistory.pop(); // Get the last added product
+      return super.remove(lastAdded); // Remove it from the basket
+    }
+    return false; // No product to undo
+  }
+
 
   /**
    * Returns a description of the products in the basket suitable for printing.
@@ -73,11 +129,16 @@ public class Basket extends ArrayList<Product> implements Serializable
     double total = 0.00;
     if ( theOrderNum != 0 )
       fr.format( "Order number: %03d\n", theOrderNum );
+      mergeDuplicateProducts();
+      sortBasketByProductNumber();
+      
+      
       
     if ( this.size() > 0 )
-    {
+    { 
       for ( Product pr: this )
-      {
+      { 
+        
         int number = pr.getQuantity();
         fr.format("%-7s",       pr.getProductNum() );
         fr.format("%-14.14s ",  pr.getDescription() );
@@ -93,4 +154,9 @@ public class Basket extends ArrayList<Product> implements Serializable
     }
     return sb.toString();
   }
+  
+  
+  
+  
+  
 }
