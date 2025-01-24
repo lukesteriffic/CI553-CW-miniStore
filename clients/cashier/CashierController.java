@@ -38,6 +38,11 @@ public class CashierController
     model.doBuy();
   }
   
+   public void doUndo() {
+       
+  model.doUndo();
+}
+  
    /**
    * Bought interaction from view
    */

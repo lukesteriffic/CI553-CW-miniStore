@@ -22,6 +22,7 @@ public class CashierView implements Observer
   private static final String CHECK  = "Check";
   private static final String BUY    = "Buy";
   private static final String BOUGHT = "Bought/Pay";
+  private static final String UNDO   = "Undo";
 
   private final JLabel      pageTitle  = new JLabel();
   private final JLabel      theAction  = new JLabel();
@@ -31,6 +32,7 @@ public class CashierView implements Observer
   private final JButton     theBtCheck = new JButton( CHECK );
   private final JButton     theBtBuy   = new JButton( BUY );
   private final JButton     theBtBought= new JButton( BOUGHT );
+  private final JButton     theBtUndo  = new JButton( UNDO );
 
   private StockReadWriter theStock     = null;
   private OrderProcessing theOrder     = null;
@@ -63,7 +65,7 @@ public class CashierView implements Observer
     Font f = new Font("Monospaced",Font.PLAIN,12);  // Font f is
 
     pageTitle.setBounds( 110, 0 , 270, 20 );       
-    pageTitle.setText( "Thank You for Shopping at MiniStrore" );                        
+    pageTitle.setText( "Thank You for Shopping at MiniStore" );                        
     cp.add( pageTitle );  
     
     theBtCheck.setBounds( 16, 25+60*0, 80, 40 );    // Check Button
@@ -75,6 +77,11 @@ public class CashierView implements Observer
     theBtBuy.addActionListener(                     // Call back code
       e -> cont.doBuy() );
     cp.add( theBtBuy );                             //  Add to canvas
+    
+    theBtUndo.setBounds( 16, 25+60*2, 80, 40 );   // Undo Button
+theBtUndo.addActionListener(                  // Call back code
+  e -> cont.doUndo() );
+cp.add( theBtUndo );                          // Add to canvas
 
     theBtBought.setBounds( 16, 25+60*3, 80, 40 );   // Bought Button
     theBtBought.addActionListener(                  // Call back code

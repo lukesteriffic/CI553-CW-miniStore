@@ -156,6 +156,17 @@ public class CashierModel extends Observable
     theBasket = null;
     setChanged(); notifyObservers(theAction); // Notify
   }
+  
+  public void doUndo() {
+  String theAction = "";
+  if (theBasket != null && theBasket.undoAdd()) {
+    theAction = "Last product removed";
+  } else {
+    theAction = "Nothing to undo";
+  }
+  setChanged();
+  notifyObservers(theAction);
+}
 
   /**
    * ask for update of view callled at start of day

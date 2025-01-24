@@ -16,6 +16,8 @@ import middle.LocalMiddleFactory;
 import middle.MiddleFactory;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Starts all the clients (user interface)  as a single application.
@@ -28,9 +30,42 @@ import java.awt.*;
 
 class Main
 {
+  private static boolean isDarkMode = false;  
+    
   public static void main (String args[])
   {
     new Main().begin();
+    
+    // Create a frame
+    JFrame frame = new JFrame("Dark Mode Toggle");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(300, 200);
+    
+    // Create a button to toggle dark mode
+    JButton toggleButton = new JButton("Toggle Dark Mode");
+
+    // Add an ActionListener to the button to toggle dark mode when clicked
+    toggleButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            toggleDarkMode();  // Call the toggleDarkMode method
+            if (isDarkMode) {
+                    toggleButton.setText("Enable Light Mode");
+                } else {
+                    toggleButton.setText("Enable Dark Mode");
+                }
+        }
+    });
+    
+    // Add the button to the frame
+        frame.setLayout(new FlowLayout());
+        frame.add(toggleButton);
+
+        // Display the frame
+        frame.setVisible(true);
+    
+    
+    
   }
 
   /**
@@ -47,6 +82,42 @@ class Main
     startBackDoorGUI_MVC( mlf );
   }
   
+  public static void toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    
+    // Dark mode colors
+    if (isDarkMode) {
+      UIManager.put("Panel.background", Color.DARK_GRAY);
+      UIManager.put("Button.background", Color.GRAY);
+      UIManager.put("Button.foreground", Color.WHITE);
+      UIManager.put("Label.foreground", Color.WHITE);
+      UIManager.put("TextField.background", Color.DARK_GRAY);
+      UIManager.put("TextField.foreground", Color.WHITE);
+    } else {
+      // Set the UI to a light (white) mode by setting the UIManager colors to light theme
+            UIManager.put("Panel.background", Color.WHITE);
+            UIManager.put("Button.background", Color.LIGHT_GRAY);
+            UIManager.put("Button.foreground", Color.BLACK);
+            UIManager.put("Label.foreground", Color.BLACK);
+            UIManager.put("TextField.background", Color.WHITE);
+            UIManager.put("TextField.foreground", Color.BLACK);
+
+            
+            
+      
+      
+    }
+    
+    // Update all existing windows
+    for (Window window : Window.getWindows()) {
+      SwingUtilities.updateComponentTreeUI(window);
+    }
+  }
+  
+
+
+  
+  
   /**
   * start the Customer client, -search product
   * @param mlf A factory to create objects to access the stock list
@@ -62,6 +133,8 @@ class Main
     CustomerView view        = new CustomerView( window, mlf, pos.width, pos.height );
     CustomerController cont  = new CustomerController( model, view );
     view.setController( cont );
+    
+    
 
     model.addObserver( view );       // Add observer to the model, ---view is observer, model is Observable
     window.setVisible(true);         // start Screen
